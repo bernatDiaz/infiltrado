@@ -55,6 +55,8 @@ class Lobby extends React.Component {
                 <span className="badge bg-primary m-2 nickname">{this.props.nickname}</span>
                 <gap></gap>
                 <button onClick={this.enableEditing} type='button' className='btn btn-primary'>Edit</button>
+                {this.props.game.host && !this.props.startPressed && 
+                <button onClick={this.props.onStartPlaying} type="button" className='btn btn-primary'>Start</button>}
                 <gap></gap>
                 <Vocabulary words={this.props.words} 
                 onAddWord={this.props.onAddWord} onRemoveWord={this.props.onRemoveWord}/>

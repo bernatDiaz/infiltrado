@@ -1,4 +1,4 @@
-import { getWSService } from './webSocket.js';
+import { getWSService, initializeWebsocket, websocketInitialized } from './webSocket';
 
 let AdapterService: Adapter | null = null;
 
@@ -9,49 +9,68 @@ class Adapter {
     this.socketConnection = null;
   }
 
-  createGame = (name: string, password:string|null): boolean => { 
-    const gameData = {
+  createGame = (name: string, password:string|null) => { 
+    const data = {
+        name,
+        password
+    } 
+    this.sendMessage("createGame", data); 
+  }
+
+  joinGame = (name: string, password:string|null) => { 
+    const data = {
         name,
         password
     }  
-    this.socketConnection = getWSService();
-
-    const timeout = setTimeout(() => {
-        if(this.socketConnection){
-            getWSService().sendMessage("createGame", gameData);
-        }
-    }, 2000);
-    return true;
+    this.sendMessage("joinGame", data);
   }
 
-  joinGame = (name: string, password:string|null): boolean => { 
-    const gameData = {
-        name,
-        password
-    }  
-    this.socketConnection = getWSService();
-
-    const timeout = setTimeout(() => {
-        if(this.socketConnection){
-            getWSService().sendMessage("joinGame", gameData);
-        }
-    }, 2000);
-    return true;
-  }
-
-  changeNickname = (nickname: string, gameID: string | null) : boolean => {
-    const gameData = {
+  changeNickname = (nickname: string, gameID: string | null) => {
+    const data = {
       nickname,
       gameID
     }  
-    this.socketConnection = getWSService();
+    this.sendMessage("changeNickname", data);
+  }
 
-    const timeout = setTimeout(() => {
-        if(this.socketConnection){
-            getWSService().sendMessage("changeNickname", gameData);
+  startPlaying = (gameID: string | null) =>{
+    const data = {
+      gameID
+    }
+
+    this.sendMessage("requestWords", data);
+  }
+
+  choseRolesAndWord = (gameID: string | null) =>{
+    const data = {
+      gameID
+    }
+
+    this.sendMessage("choseRolesAndWord", data);
+  }
+
+  sendWords = (words: string[], gameID: string) =>{
+    const data = {
+      words,
+      gameID
+    }
+
+    this.sendMessage("addWords", data);
+  }
+
+  sendMessage = (route: string, data: object) => {
+    if(!websocketInitialized()){
+      initializeWebsocket();
+      const interval = setInterval(()=>{
+        if(websocketInitialized()){
+          clearInterval(interval);
+          getWSService().sendMessage(route, data);
         }
-    }, 2000);
-    return true;
+      }, 200);
+    }
+    else{
+      getWSService().sendMessage(route, data);
+    }
   }
   
 

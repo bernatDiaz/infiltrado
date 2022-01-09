@@ -103,6 +103,20 @@ class WebSocketService {
     }
   }
 
+  static initialize(){
+    if(!WSService){
+      WSService = new WebSocketService();
+    }
+    WSService.initSocket();
+  }
+
+  static isInitialized(){
+    if(!WSService){
+      return false;
+    }
+    return true;
+  }
+
   static initWSService() {    
     if (!WSService) {      
       WSService = new WebSocketService();
@@ -115,4 +129,11 @@ class WebSocketService {
 
 }
 
+/*export const WSS = {
+  getWSService: WebSocketService.initWSService,
+  isInitialized: WebSocketService.isInitialized,
+  initialize: WebSocketService.initialize,
+};*/
 export const getWSService = WebSocketService.initWSService;
+export const websocketInitialized = WebSocketService.isInitialized;
+export const initializeWebsocket = WebSocketService.initialize;
