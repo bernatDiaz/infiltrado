@@ -58,6 +58,15 @@ class Adapter {
     this.sendMessage("addWords", data);
   }
 
+  sayWord = (word: string, gameID: string) => {
+    const data = {
+      word,
+      gameID
+    }
+
+    this.sendMessage("sayWord", data);
+  }
+
   sendMessage = (route: string, data: object) => {
     if(!websocketInitialized()){
       initializeWebsocket();

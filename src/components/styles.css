@@ -28,6 +28,11 @@
   flex-wrap: wrap;
 }
 
+.player {
+  display: flex;
+  flex-direction: column;
+}
+
 .vocabulary-background {
   display: flex;
   align-items: center;
@@ -60,6 +65,12 @@
   margin: 0;
 }
 
+.nicknames-grid {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
 .nickname {
   font-size: 1.5rem;
   min-width: 8rem;
@@ -77,6 +88,12 @@
 }
 
 .game-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.role-container {
   display: flex;
   flex-direction: column;
   align-items: center;

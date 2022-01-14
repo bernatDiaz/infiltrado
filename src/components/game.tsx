@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Lobby from './lobby.jsx';
 import { getAdapterService } from '../services/adapter.tsx';
 import { getWSService } from '../services/webSocket';
+import Play from './play.jsx';
 
 const MIN_PLAYERS = 2;
 
@@ -13,13 +14,15 @@ class Game extends React.Component {
             nickname: null,
             nicknames: [],
             words: ["house", "ship", "car"],
-            startPressed: false
+            startPressed: false,
         };
     }
     componentDidMount(){
         getWSService().addMessageListener("changeNickname", this.onChangeNickname);
         getWSService().addMessageListener("nicknames", this.onPlayerNicknames);
         getWSService().addMessageListener("requestWords", this.onRequestWords);
+        getWSService().addMessageListener("startGame", this.onStartGame);
+        getWSService().addMessageListener("lastWords", this.onUpdateLastWords);
     }
     waitingForChangeNicknameResponse = () =>{
         this.setState({
@@ -176,6 +179,40 @@ class Game extends React.Component {
             },3000)
         }
     }
+    onStartGame = (message) => {
+        const players = message.players.filter(player => 
+            {
+                return player.nickname !== this.state.nickname
+            })
+        const I = message.players.filter(player => 
+            {
+                return player.nickname === this.state.nickname
+            })[0]
+        this.setState({
+            screen: SCREEN.PLAY,
+            players,
+            eliminated: I.eliminated,
+            infiltrado: message.infiltrado,
+            word: message.word
+        })
+    }
+    onUpdateLastWords = (message) => {
+        const players = message.players.filter(player => 
+            {
+                return player.nickname !== this.state.nickname
+            })
+        const I = message.players.filter(player => 
+            {
+                return player.nickname === this.state.nickname
+            })[0]
+        console.log(I);
+        this.setState({
+            screen: SCREEN.PLAY,
+            players,
+            eliminated: I.eliminated,
+            lastWord: I.lastWord,
+        })
+    }
     renderLobby(){
         return (
             <Lobby 
@@ -191,14 +228,30 @@ class Game extends React.Component {
             />
         )
     }
+    renderPlay(){
+        return(
+            <Play
+            players = {this.state.players}
+            nickname = {this.state.nickname}
+            eliminated = {this.state.eliminated}
+            lastWord = {this.state.lastWord}
+            notificationSystem = {this.props.notificationSystem}
+            game = {this.props.game}
+            infiltrado = {this.state.infiltrado}
+            word = {this.state.word}
+            />
+        )
+    }
     render() { 
         switch(this.state.screen){
             case SCREEN.LOBBY:
                 return this.renderLobby();
+            case SCREEN.PLAY:
+                return this.renderPlay();
         }
     }
 }
 
-enum SCREEN {LOBBY}
+enum SCREEN {LOBBY, PLAY}
 
 export default Game;
