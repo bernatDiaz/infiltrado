@@ -133,7 +133,7 @@ class App extends React.Component <{}, { [key: string]: any}>{
     onCreateCode = (message) => {
         if(message.type){
             if(message.type === "success"){
-                let obj = {name: message.name, password: message.password, host:true};
+                let obj = {name: message.name, password: message.password, host:true, mode:"local"};
                 this.setState({
                     game: obj,
                     screen: SCREEN.GAME
@@ -162,40 +162,38 @@ class App extends React.Component <{}, { [key: string]: any}>{
         else{
             console.log("missing message type");
         }
-    }    
+    }  
+    onModeChange = (value) => {
+        const game = {...this.state.game};
+        game.mode = value;
+        this.setState({
+            game,
+        })
+    }  
     renderStart(){
-        return (
-            <div className='screen'>
-                <NotificationSystem ref={this.notificationSystem} />
+        return <React.Fragment>
                 <Start onJoin={this.handleJoin} onCreate={this.handleCreate}/>
-            </div>
-            );
+            </React.Fragment>
     }
     renderJoin(){
-        return (
-            <div className='screen'>
-                <NotificationSystem ref={this.notificationSystem} />
+        return <React.Fragment>
                 <Join onSubmit={this.handleJoinCode} active={this.state.joinAvailible}/>
-            </div>
-            );
+            </React.Fragment>
     }
     renderCreate(){
-        return(
-            <div className='screen'>
-                <NotificationSystem ref={this.notificationSystem} />
+        return <React.Fragment>
                 <Create onSubmit={this.handleCreateCode} active={this.state.createAvailible}/>
-            </div>
-        )
+            </React.Fragment>
     }
     renderGame(){
-        return (
-            <div className='screen'>
-                <NotificationSystem ref={this.notificationSystem} />
-                <Game notificationSystem={this.notificationSystem} game={this.state.game}/>
-            </div>
-        )
+        return <React.Fragment>
+                <Game 
+                notificationSystem={this.notificationSystem} 
+                game={this.state.game}
+                onModeChange={this.onModeChange}/>
+            </React.Fragment>
     }
-    render() { 
+    renderConditional() { 
         switch(this.state.screen){
             case SCREEN.START:
                 return this.renderStart();
@@ -206,6 +204,14 @@ class App extends React.Component <{}, { [key: string]: any}>{
             case SCREEN.GAME:
                 return this.renderGame();
         }
+    }
+    render(){
+        return(
+            <div className='screen'>
+                <NotificationSystem ref={this.notificationSystem} />
+                {this.renderConditional()}
+            </div>
+        )
     }
 }
 

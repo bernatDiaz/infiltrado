@@ -3,6 +3,7 @@ import Lobby from './lobby.jsx';
 import { getAdapterService } from '../services/adapter.tsx';
 import { getWSService } from '../services/webSocket';
 import Play from './play.jsx';
+import PlayOnline from './playOnline.jsx';
 
 const MIN_PLAYERS = 2;
 
@@ -15,6 +16,7 @@ class Game extends React.Component {
             nicknames: [],
             words: ["house", "ship", "car"],
             startPressed: false,
+            showTimer: true,
         };
     }
     componentDidMount(){
@@ -23,7 +25,12 @@ class Game extends React.Component {
         getWSService().addMessageListener("requestWords", this.onRequestWords);
         getWSService().addMessageListener("startGame", this.onStartGame);
         getWSService().addMessageListener("lastWords", this.onUpdateLastWords);
+        getWSService().addMessageListener("votes", this.onVotes);
+        this._isMounted = true;
     }
+    componentWillUnmount() {
+        this._isMounted = false;
+      }
     waitingForChangeNicknameResponse = () =>{
         this.setState({
             changeNicknameAvailible: false
@@ -35,11 +42,20 @@ class Game extends React.Component {
         })
     }
     handleChangeNickname = (name: string) =>{
+        const reservedKeywords = ["_abstenido", "_nobody"];
         if(name === ""){
             const notification = this.props.notificationSystem.current;
             notification.addNotification({
                 message: "Nickname must not be empty",
                 level: 'error',
+                position: 'tc'
+            });
+        }
+        else if(reservedKeywords.includes(name)){
+            const notification = this.props.notificationSystem.current;
+            notification.addNotification({
+                message: "That name is reserved",
+                level: 'warning',
                 position: 'tc'
             });
         }
@@ -153,7 +169,7 @@ class Game extends React.Component {
             this.setState({
                 startPressed: true
             })
-            getAdapterService().startPlaying(this.props.game.name);
+            getAdapterService().startPlaying(this.props.game);
         }
         else{
             const notification = this.props.notificationSystem.current;
@@ -188,12 +204,15 @@ class Game extends React.Component {
             {
                 return player.nickname === this.state.nickname
             })[0]
+        const game = {...this.state.game};
+        game.mode = message.mode;
         this.setState({
             screen: SCREEN.PLAY,
             players,
             eliminated: I.eliminated,
             infiltrado: message.infiltrado,
-            word: message.word
+            word: message.word,
+            game,
         })
     }
     onUpdateLastWords = (message) => {
@@ -213,6 +232,82 @@ class Game extends React.Component {
             lastWord: I.lastWord,
         })
     }
+    handleVote = (nickname) => {
+        this.setState({
+            player_voted: nickname
+        })
+    }
+    onVotes = (message) => {
+        const {votes, playerEliminated} = message;
+        console.log("votes", votes);
+        console.log("playerEliminated", playerEliminated);
+        this.setState({
+            votes,
+        })
+        setTimeout(()=>{
+            if(this._isMounted){
+                this.setState({
+                    votes: undefined,
+                    showTimer: false,
+                })
+                const notificationTime = 5;
+                if(playerEliminated != "_nobody"){
+                    const notificationTime = 5;
+                    const notification = this.props.notificationSystem.current;
+                    notification.addNotification({
+                        message: playerEliminated + " was eliminated",
+                        level: 'info',
+                        position: 'bc',
+                        dismissible: 'none',
+                        autoDismiss: notificationTime,
+                    })
+                }
+                else{
+                    const notification = this.props.notificationSystem.current;
+                    notification.addNotification({
+                        message: "Nobody was eliminated",
+                        level: 'info',
+                        position: 'bc',
+                        dismissible: 'none',
+                        autoDismiss: notificationTime,
+                    })
+                }
+                setTimeout(() => {
+                    if(this._isMounted){
+                        if(message.winner != "_nobody"){
+                            this.setState({
+                                winner: message.winner
+                            })
+                        }
+                        else{
+                            console.log("No winner yet");
+                            const players = this.state.players;
+                            const playersModified = players.map((player) => {
+                                return {
+                                    nickname: player.nickname,
+                                    eliminated: player.eliminated || playerEliminated === player.nickname,
+                                    lastWord: "",
+                                }
+                            });
+                            this.setState({
+                                players: playersModified,
+                                nickname: this.state.nickname,
+                                eliminated: this.state.eliminated || playerEliminated === this.state.nickname,
+                                lastWord: "",
+                                showTimer: true,
+                                player_voted: undefined,
+                            });
+                        }
+                    }
+                }, notificationTime * 1000)
+            }
+        },3000);
+    }
+    handleTimerReset(){
+        this.setState({
+            resetTimer: false,
+        })
+    }
     renderLobby(){
         return (
             <Lobby 
@@ -225,12 +320,13 @@ class Game extends React.Component {
             onRemoveWord={this.handleRemoveWord}
             onStartPlaying={this.handleStartPlaying}
             startPressed={this.state.startPressed}
+            onModeChange={this.props.onModeChange}
             />
         )
     }
     renderPlay(){
         return(
-            <Play
+            <PlayOnline
             players = {this.state.players}
             nickname = {this.state.nickname}
             eliminated = {this.state.eliminated}
@@ -239,6 +335,10 @@ class Game extends React.Component {
             game = {this.props.game}
             infiltrado = {this.state.infiltrado}
             word = {this.state.word}
+            votes = {this.state.votes}
+            showTimer = {this.state.showTimer}
+            handleVote = {this.handleVote}
+            player_voted = {this.state.player_voted}
             />
         )
     }

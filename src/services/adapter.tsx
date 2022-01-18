@@ -33,9 +33,10 @@ class Adapter {
     this.sendMessage("changeNickname", data);
   }
 
-  startPlaying = (gameID: string | null) =>{
+  startPlaying = (game) =>{
     const data = {
-      gameID
+      gameID: game.name,
+      mode: game.mode,
     }
 
     this.sendMessage("requestWords", data);
@@ -65,6 +66,15 @@ class Adapter {
     }
 
     this.sendMessage("sayWord", data);
+  }
+
+  timeout = (gameID: string, playerVoted: string) => {
+    const data = {
+      gameID,
+      playerVoted,
+    }
+
+    this.sendMessage("timeout", data);
   }
 
   sendMessage = (route: string, data: object) => {

@@ -3,6 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import GameName from './gameName';
 import Vocabulary from './vocabulary';
 import Nicknames from './nicknames';
+import GameMode from './gameMode';
 
 class Lobby extends React.Component {
     constructor(props){
@@ -82,19 +83,62 @@ class Lobby extends React.Component {
             </div>
         );
     }
+    conditionalRenderHost(){
+        if(this.props.game.host){
+            if(!this.props.startPressed){
+                return <React.Fragment>
+                    <button onClick={this.props.onStartPlaying} type="button" className='btn btn-primary'>Start</button>
+                    <GameMode
+                    onModeChange={this.props.onModeChange}
+                    gameMode={this.props.game.mode}
+                    />
+                </React.Fragment> 
+            }
+        }
+    }
 
-    render() { 
+    conditionalRenderingNickname(){
         if(this.props.nickname === null){
-            return this.renderNoNickname();
+            return <React.Fragment>
+                <h5 className="h5">Enter your nickname</h5>
+                <input value={this.state.inputName} onChange={event => {this.updateInputName(event);}}/>
+                <button onClick={this.changeNickname} type="button" className="btn btn-primary">Submit</button>
+            </React.Fragment>
         }
         else{
             if(this.state.editing){
-                return this.renderEditNickname();
+                return <React.Fragment>
+                    <span className="badge bg-primary m-2 nickname">{this.props.nickname}</span>
+                    <gap></gap>
+                    <input value={this.state.inputName} onChange={event => {this.updateInputName(event);}}/>
+                    <div className='edit-container'>
+                        <button onClick={this.changeNickname} type="button" className="btn btn-primary">Change</button>
+                        <button onClick={this.disableEditing} type="button" className="btn btn-primary">Cancel</button>
+                    </div>
+                </React.Fragment>
             }
             else{
-                return this.renderWithNickname();
+                return <React.Fragment>
+                    <span className="badge bg-primary m-2 nickname">{this.props.nickname}</span>
+                    <gap></gap>
+                    <button onClick={this.enableEditing} type='button' className='btn btn-primary'>Edit</button>
+                </React.Fragment>
             }
         }
+    }
+
+    render() { 
+        return(
+            <div className='container'>
+                <GameName game={this.props.game}/>
+                <Nicknames players={this.props.players}/>
+                {this.conditionalRenderingNickname()}
+                {this.conditionalRenderHost()}
+                <gap></gap>
+                <Vocabulary words={this.props.words} 
+                onAddWord={this.props.onAddWord} onRemoveWord={this.props.onRemoveWord}/>       
+            </div>
+        );
     }
 
     updateInputName(event){

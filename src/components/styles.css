@@ -1,3 +1,20 @@
+.chose-game-mode-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.chose-game-mode-element {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 0;
+  margin-right: 2rem;
+  margin-left: 2rem;
+}
+.chose-game-mode-element h4,
+.chose-game-mode-element input {
+  margin-bottom: 0;
+}
 .container {
   display: flex;
   flex-direction: column;
@@ -12,17 +29,36 @@
   width: 8rem;
 }
 
-.screen {
-  background-color: coral;
-  min-height: 100vh;
-  min-width: 100vw;
+.edit-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.edit-container * {
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+}
+
+.empty-vote {
+  width: 1rem;
+  height: 1.5rem;
+  margin-bottom: 0;
+  margin-left: 0.5rem;
+}
+
+.game-info {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
 }
 
-.players-grid {
+.nickname {
+  font-size: 1.5rem;
+  min-width: 8rem;
+}
+
+.nicknames-grid {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
@@ -31,6 +67,34 @@
 .player {
   display: flex;
   flex-direction: column;
+}
+
+.players-grid {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.role-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.say-word-input {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.screen {
+  background-color: coral;
+  min-height: 100vh;
+  min-width: 100vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .vocabulary-background {
@@ -65,36 +129,18 @@
   margin: 0;
 }
 
-.nicknames-grid {
+.votes {
   display: flex;
   flex-direction: row;
-  flex-wrap: wrap;
+  height: fit-content;
+  margin-bottom: 0;
 }
 
-.nickname {
-  font-size: 1.5rem;
-  min-width: 8rem;
-}
-
-.edit-container {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-}
-
-.edit-container * {
+.vote {
+  width: 1rem;
+  height: 1.5rem;
+  border: 1px solid black;
+  background: red;
+  margin-bottom: 0;
   margin-left: 0.5rem;
-  margin-right: 0.5rem;
-}
-
-.game-info {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.role-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 }
