@@ -9,6 +9,10 @@ class Timer extends Component {
     }
     componentDidMount(){
         this.startTimer();
+        this._isMounted = true;
+    }
+    componentWillUnmount() {
+        this._isMounted = false;
     }
     secondsToTime(secs){
         let hours = Math.floor(secs / (60 * 60));
@@ -45,16 +49,21 @@ class Timer extends Component {
         }
     }
     countDown = () => {
-        // Remove one second, set state so a re-render happens.
-        let seconds = this.state.seconds - 1;
-        this.setState({
-          time: this.secondsToTime(seconds),
-          seconds: seconds,
-        });
-        // Check if we're at zero.
-        if (seconds == 0) { 
-          clearInterval(this.timer);
-          this.props.onTimeout();
+        if(this._isMounted){
+            // Remove one second, set state so a re-render happens.
+            let seconds = this.state.seconds - 1;
+            this.setState({
+            time: this.secondsToTime(seconds),
+            seconds: seconds,
+            });
+            // Check if we're at zero.
+            if (seconds == 0) { 
+            clearInterval(this.timer);
+            this.props.onTimeout();
+            }
+        }
+        else{
+            clearInterval(this.timer);
         }
     }
     render() { 

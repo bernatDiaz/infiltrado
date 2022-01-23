@@ -81,6 +81,12 @@
   align-items: center;
 }
 
+.round-time-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
 .say-word-input {
   display: flex;
   flex-direction: column;

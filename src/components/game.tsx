@@ -4,6 +4,7 @@ import { getAdapterService } from '../services/adapter.tsx';
 import { getWSService } from '../services/webSocket';
 import Play from './play.jsx';
 import PlayOnline from './playOnline.jsx';
+import PlayLocal from './playLocal.jsx';
 
 const MIN_PLAYERS = 2;
 
@@ -14,9 +15,8 @@ class Game extends React.Component {
             screen: SCREEN.LOBBY,
             nickname: null,
             nicknames: [],
-            words: ["house", "ship", "car"],
+            words: [],
             startPressed: false,
-            showTimer: true,
         };
     }
     componentDidMount(){
@@ -26,11 +26,12 @@ class Game extends React.Component {
         getWSService().addMessageListener("startGame", this.onStartGame);
         getWSService().addMessageListener("lastWords", this.onUpdateLastWords);
         getWSService().addMessageListener("votes", this.onVotes);
+        getWSService().addMessageListener("startTimeout", this.onStartTimeout);
         this._isMounted = true;
     }
     componentWillUnmount() {
         this._isMounted = false;
-      }
+    }
     waitingForChangeNicknameResponse = () =>{
         this.setState({
             changeNicknameAvailible: false
@@ -196,6 +197,7 @@ class Game extends React.Component {
         }
     }
     onStartGame = (message) => {
+        console.log("onStartGame", message)
         const players = message.players.filter(player => 
             {
                 return player.nickname !== this.state.nickname
@@ -204,15 +206,21 @@ class Game extends React.Component {
             {
                 return player.nickname === this.state.nickname
             })[0]
-        const game = {...this.state.game};
-        game.mode = message.mode;
+        this.props.onModeChange(message.mode);
+        let timer;
+        if(message.mode === "local"){
+            timer = false;
+        }
+        else if(message.mode === "online"){
+            timer = true;
+        }
         this.setState({
             screen: SCREEN.PLAY,
             players,
             eliminated: I.eliminated,
             infiltrado: message.infiltrado,
             word: message.word,
-            game,
+            timer,
         })
     }
     onUpdateLastWords = (message) => {
@@ -232,6 +240,11 @@ class Game extends React.Component {
             lastWord: I.lastWord,
         })
     }
+    onStartTimeout = (message) => {
+        this.setState({
+            timer: true,
+        })
+    }
     handleVote = (nickname) => {
         this.setState({
             player_voted: nickname
@@ -248,10 +261,10 @@ class Game extends React.Component {
             if(this._isMounted){
                 this.setState({
                     votes: undefined,
-                    showTimer: false,
+                    timer: false,
                 })
                 const notificationTime = 5;
-                if(playerEliminated != "_nobody"){
+                if(playerEliminated !== "_nobody"){
                     const notificationTime = 5;
                     const notification = this.props.notificationSystem.current;
                     notification.addNotification({
@@ -274,10 +287,16 @@ class Game extends React.Component {
                 }
                 setTimeout(() => {
                     if(this._isMounted){
-                        if(message.winner != "_nobody"){
-                            this.setState({
-                                winner: message.winner
+                        if(message.winner !== "_nobody"){
+                            const notification = this.props.notificationSystem.current;
+                            notification.addNotification({
+                                message: message.winner + " wins",
+                                level: 'info',
+                                position: 'bc',
+                                dismissible: 'none',
+                                autoDismiss: 5,
                             })
+                            this.onGameFinish();
                         }
                         else{
                             console.log("No winner yet");
@@ -289,19 +308,36 @@ class Game extends React.Component {
                                     lastWord: "",
                                 }
                             });
-                            this.setState({
-                                players: playersModified,
-                                nickname: this.state.nickname,
-                                eliminated: this.state.eliminated || playerEliminated === this.state.nickname,
-                                lastWord: "",
-                                showTimer: true,
-                                player_voted: undefined,
-                            });
+                            if(this.props.game.mode === "online"){
+                                this.setState({
+                                    players: playersModified,
+                                    nickname: this.state.nickname,
+                                    eliminated: this.state.eliminated || playerEliminated === this.state.nickname,
+                                    lastWord: "",
+                                    player_voted: undefined,
+                                    timer: true
+                                })
+                            }
+                            else if(this.props.game.mode === "local"){
+                                this.setState({
+                                    players: playersModified,
+                                    nickname: this.state.nickname,
+                                    eliminated: this.state.eliminated || playerEliminated === this.state.nickname,
+                                    lastWord: "",
+                                    player_voted: undefined,
+                                })
+                            }
                         }
                     }
                 }, notificationTime * 1000)
             }
         },3000);
+    }
+    onGameFinish = () => {
+        this.setState({
+            screen: SCREEN.LOBBY,
+            startPressed: false,
+        })
     }
     handleTimerReset(){
         this.setState({
@@ -325,22 +361,44 @@ class Game extends React.Component {
         )
     }
     renderPlay(){
-        return(
-            <PlayOnline
-            players = {this.state.players}
-            nickname = {this.state.nickname}
-            eliminated = {this.state.eliminated}
-            lastWord = {this.state.lastWord}
-            notificationSystem = {this.props.notificationSystem}
-            game = {this.props.game}
-            infiltrado = {this.state.infiltrado}
-            word = {this.state.word}
-            votes = {this.state.votes}
-            showTimer = {this.state.showTimer}
-            handleVote = {this.handleVote}
-            player_voted = {this.state.player_voted}
-            />
-        )
+        if(this.props.game.mode === "online"){
+            return(
+                <PlayOnline
+                players = {this.state.players}
+                nickname = {this.state.nickname}
+                eliminated = {this.state.eliminated}
+                lastWord = {this.state.lastWord}
+                notificationSystem = {this.props.notificationSystem}
+                game = {this.props.game}
+                infiltrado = {this.state.infiltrado}
+                word = {this.state.word}
+                votes = {this.state.votes}
+                timer = {this.state.timer}
+                handleVote = {this.handleVote}
+                player_voted = {this.state.player_voted}
+                />
+            )
+        }
+        else if(this.props.game.mode === "local"){
+            return(
+                <PlayLocal
+                players = {this.state.players}
+                nickname = {this.state.nickname}
+                eliminated = {this.state.eliminated}
+                notificationSystem = {this.props.notificationSystem}
+                game = {this.props.game}
+                infiltrado = {this.state.infiltrado}
+                word = {this.state.word}
+                votes = {this.state.votes}
+                timer = {this.state.timer}
+                handleVote = {this.handleVote}
+                player_voted = {this.state.player_voted}
+                />
+            )
+        }
+        else{
+            console.log(this.props.game.mode)
+        }
     }
     render() { 
         switch(this.state.screen){

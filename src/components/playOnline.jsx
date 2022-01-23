@@ -7,6 +7,8 @@ import Timer from './timer';
 import Play from './play';
 import PlayerOnline from './playerOnline';
 
+const TIME = 30;
+
 class PlayOnline extends Play {
     constructor(props){
         super(props);
@@ -36,8 +38,8 @@ class PlayOnline extends Play {
     render() { 
         return (
             <div className='container'>
-                {this.props.showTimer &&
-                this.timer()}
+                {this.props.timer &&
+                this.timer(TIME)}
                 <div className='players-grid'>
                     {this.props.players.map(player => 
                     <PlayerOnline
@@ -58,7 +60,7 @@ class PlayOnline extends Play {
                 eliminated={this.props.eliminated}
                 votes={this.getVotes(this.props.nickname)}
                 />
-                {!this.props.lastWord && 
+                {!this.props.lastWord && this.props.timer &&
                 <div className="say-word-input">
                 <input value={this.state.inputWord} onChange={event => {this.updateInput(event);}}/>
                 <button onClick={this.sendWord} type="button" className="btn btn-primary">Send</button>

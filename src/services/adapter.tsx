@@ -68,6 +68,14 @@ class Adapter {
     this.sendMessage("sayWord", data);
   }
 
+  startTimeout = (gameID: string) => {
+    const data = {
+      gameID
+    }
+
+    this.sendMessage("startTimeout", data);
+  }
+
   timeout = (gameID: string, playerVoted: string) => {
     const data = {
       gameID,

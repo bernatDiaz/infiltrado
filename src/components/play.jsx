@@ -34,9 +34,9 @@ class Play extends React.Component {
         word={this.props.word}
         />
     }
-    timer(){
+    timer(time){
         return <Timer
-        seconds={20}
+        seconds={time}
         onTimeout={this.handleTimeout}/>
     }
     render() { 
