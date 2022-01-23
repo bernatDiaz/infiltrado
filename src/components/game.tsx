@@ -311,7 +311,6 @@ class Game extends React.Component {
                             if(this.props.game.mode === "online"){
                                 this.setState({
                                     players: playersModified,
-                                    nickname: this.state.nickname,
                                     eliminated: this.state.eliminated || playerEliminated === this.state.nickname,
                                     lastWord: "",
                                     player_voted: undefined,
@@ -321,7 +320,6 @@ class Game extends React.Component {
                             else if(this.props.game.mode === "local"){
                                 this.setState({
                                     players: playersModified,
-                                    nickname: this.state.nickname,
                                     eliminated: this.state.eliminated || playerEliminated === this.state.nickname,
                                     lastWord: "",
                                     player_voted: undefined,
@@ -337,6 +335,8 @@ class Game extends React.Component {
         this.setState({
             screen: SCREEN.LOBBY,
             startPressed: false,
+            player_voted: undefined,
+            lastWord: "",
         })
     }
     handleTimerReset(){
