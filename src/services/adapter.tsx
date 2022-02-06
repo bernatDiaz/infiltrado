@@ -85,6 +85,14 @@ class Adapter {
     this.sendMessage("timeout", data);
   }
 
+  abandon = (gameID: string) => {
+    const data = {
+      gameID
+    }
+
+    this.sendMessage("abandon", data);
+  }
+
   sendMessage = (route: string, data: object) => {
     if(!websocketInitialized()){
       initializeWebsocket();

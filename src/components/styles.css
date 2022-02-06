@@ -1,3 +1,9 @@
+.btn-abandon {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
 .chose-game-mode-container {
   display: flex;
   flex-direction: row;

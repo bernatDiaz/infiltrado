@@ -27,6 +27,7 @@ class Game extends React.Component {
         getWSService().addMessageListener("lastWords", this.onUpdateLastWords);
         getWSService().addMessageListener("votes", this.onVotes);
         getWSService().addMessageListener("startTimeout", this.onStartTimeout);
+        getWSService().addMessageListener("abandoned", this.onPlayerAbandon);
         this._isMounted = true;
     }
     componentWillUnmount() {
@@ -330,6 +331,48 @@ class Game extends React.Component {
                 }, notificationTime * 1000)
             }
         },3000);
+    }
+    onPlayerAbandon = (message) => {
+        console.log("onPlayerAbandon");
+        const {player, winner} = message;
+        const notification = this.props.notificationSystem.current;
+        const notificationTime = 3;
+        notification.addNotification({
+            message: player + " abandoned",
+            level: 'info',
+            position: 'bc',
+            dismissible: 'none',
+            autoDismiss: notificationTime,
+        })
+        const players = [...this.state.players];
+        const index = players.findIndex(p => p.nickname === player);
+        if(index != -1){
+            const playerEliminated = {...players[index]}
+            playerEliminated.eliminated = true;
+            players[index] = playerEliminated;
+            this.setState({
+                players
+            })
+        }
+        else{
+            if(this.state.nickname === player){
+                this.setState({
+                    eliminated: true
+                });
+            }
+        }
+        if(winner !== "_nobody"){
+            setTimeout(() => {
+                notification.addNotification({
+                    message: winner + " wins",
+                    level: 'info',
+                    position: 'bc',
+                    dismissible: 'none',
+                    autoDismiss: 5,
+                })
+                this.onGameFinish();
+            }, notificationTime * 1000)
+        }
     }
     onGameFinish = () => {
         this.setState({

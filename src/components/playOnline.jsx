@@ -7,7 +7,7 @@ import Timer from './timer';
 import Play from './play';
 import PlayerOnline from './playerOnline';
 
-const TIME = 30;
+const TIME = 90;
 
 class PlayOnline extends Play {
     constructor(props){
@@ -38,6 +38,7 @@ class PlayOnline extends Play {
     render() { 
         return (
             <div className='container'>
+                {this.abandon()}
                 {this.props.timer &&
                 this.timer(TIME)}
                 <div className='players-grid'>

@@ -24,6 +24,7 @@ class PlayLocal extends Play {
     render() { 
         return (
             <div className='container'>
+                {this.abandon()}
                 {this.props.timer &&
                 this.timer(TIME)}
                 <div className='players-grid'>
