@@ -46,7 +46,8 @@ class PlayLocal extends Play {
                 votes={this.getVotes(this.props.nickname)}
                 />
                 {this.conditionalRenderHost()}
-                {this.role()}
+                <h5>{this.props.first} goes first</h5>
+                {this.role()}    
             </div>);
     }
 }

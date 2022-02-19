@@ -209,8 +209,10 @@ class Game extends React.Component {
             })[0]
         this.props.onModeChange(message.mode);
         let timer;
+        let first = undefined;
         if(message.mode === "local"){
             timer = false;
+            first = message.first;
         }
         else if(message.mode === "online"){
             timer = true;
@@ -222,6 +224,7 @@ class Game extends React.Component {
             infiltrado: message.infiltrado,
             word: message.word,
             timer,
+            first,
         })
     }
     onUpdateLastWords = (message) => {
@@ -436,6 +439,7 @@ class Game extends React.Component {
                 timer = {this.state.timer}
                 handleVote = {this.handleVote}
                 player_voted = {this.state.player_voted}
+                first={this.state.first}
                 />
             )
         }
