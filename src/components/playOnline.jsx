@@ -63,8 +63,8 @@ class PlayOnline extends Play {
                 />
                 {!this.props.lastWord && this.props.timer &&
                 <div className="say-word-input">
-                <input value={this.state.inputWord} onChange={event => {this.updateInput(event);}}/>
-                <button onClick={this.sendWord} type="button" className="btn btn-primary">Send</button>
+                <input className='input-medium' value={this.state.inputWord} onChange={event => {this.updateInput(event);}}/>
+                <button onClick={this.sendWord} type="button" className="btn btn-primary btn-medium">Send</button>
                 </div>}
                 {this.role()}
             </div>);

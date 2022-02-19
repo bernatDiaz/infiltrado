@@ -9,8 +9,8 @@ class Start extends React.Component {
     render() { 
         return (
         <div className='container'>
-            <button onClick={this.props.onJoin} type="button" className="btn btn-primary">Join</button>
-            <button onClick={this.props.onCreate} type="button" className="btn btn-primary">Create</button>
+            <button onClick={this.props.onJoin} type="button" className="btn btn-primary btn-start">Join</button>
+            <button onClick={this.props.onCreate} type="button" className="btn btn-primary btn-start">Create</button>
         </div>);
     }
 }

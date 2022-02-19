@@ -68,8 +68,8 @@ class Timer extends Component {
     }
     render() { 
         return (
-        <div>
-            {this.state.time && <h1>{this.state.time.m}:{this.state.time.s}</h1>}
+        <div className='timer-container'>
+            {this.state.time && <h1 className='timer-text'>{this.state.time.m}:{this.state.time.s}</h1>}
         </div>
         );
     }

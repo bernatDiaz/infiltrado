@@ -9,7 +9,7 @@ class Nicknames extends React.Component {
         return (
             <div className='nicknames-grid'>
                 {this.props.players.map(player => <span key={player} 
-                className="badge bg-primary m-2 nickname"> {player}</span>)}
+                className="badge bg-primary m-2 nickname nickname-small"> {player}</span>)}
             </div>
         );
     }

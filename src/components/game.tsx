@@ -6,7 +6,7 @@ import Play from './play.jsx';
 import PlayOnline from './playOnline.jsx';
 import PlayLocal from './playLocal.jsx';
 
-const MIN_PLAYERS = 2;
+const MIN_PLAYERS = 3;
 
 class Game extends React.Component {
     constructor(props: any){

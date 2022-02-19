@@ -25,8 +25,8 @@ class Vocabulary extends React.Component {
                         {this.props.words.map(word => <Word key={word} word={word} onRemove={this.props.onRemoveWord}/>)}
                     </div>
                 </div>
-                <input value={this.state.inputWord} onChange={event => {this.updateInputWord(event);}}/>
-                <button onClick={this.addWord} type="button" className="btn btn-primary">Add</button>
+                <input className='input-small' value={this.state.inputWord} onChange={event => {this.updateInputWord(event);}}/>
+                <button onClick={this.addWord} type="button" className="btn btn-primary btn-small">Add</button>
             </div>
             );
     }
